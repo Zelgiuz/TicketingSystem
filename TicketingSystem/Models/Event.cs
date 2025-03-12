@@ -14,7 +14,7 @@ namespace TicketingSystem.Controllers
         public string Name { get; set; }
         public string Description { get; set; }
         public DateTime StartDate { get; set; }
-        public List<Section> EventCategories { get; set; } = new List<Section>();
+        public List<Section> Sections { get; set; } = new List<Section>();
 
     }
 }

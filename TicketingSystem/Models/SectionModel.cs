@@ -6,15 +6,14 @@
         public int Capacity { get; set; }
         public decimal Price { get; set; }
 
-        public Section MakeSection(string eventId)
+        public Section MakeSection(string eventId, int sectionNumber)
         {
             return new Section()
             {
                 SectionCapacity = Capacity,
-                SectionName = Name,
                 EventId = eventId,
                 Price = Price,
-                Id = Guid.NewGuid().ToString()
+                Id = sectionNumber
             };
 
         }

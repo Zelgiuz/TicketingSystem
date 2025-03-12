@@ -20,8 +20,26 @@ namespace TicketingSystem.Controllers
             Event result = new Event();
             try
             {
-                if (eventMaker == null || eventMaker.Categories.Count < 1)
+                if (eventMaker == null || eventMaker.Sections.Count < 1)
                     return new BadRequestObjectResult("Must have a valid event with at least one category");
+                result = eventMaker.CreateEvent();
+
+                var eventContainer = database.GetContainer("Events");
+                var ticketContainer = database.GetContainer("Tickets");
+
+
+                await eventContainer.UpsertItemAsync(result);
+                List<Task> tasks = new List<Task>();
+                foreach (var section in result.Sections)
+                {
+                    for (int i = 1; i <= section.SectionCapacity; i++)
+                    {
+                        Ticket ticket = new Ticket(section, i);
+                        await ticketContainer.UpsertItemAsync(ticket);
+                    }
+                }
+
+
 
             }
             catch (Exception ex)

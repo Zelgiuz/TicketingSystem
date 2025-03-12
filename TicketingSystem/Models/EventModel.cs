@@ -9,7 +9,7 @@ namespace TicketingSystem.Models
         public string VenueId { get; set; }
         public string Description { get; set; }
 
-        public List<SectionModel> Categories { get; set; }
+        public List<SectionModel> Sections { get; set; }
 
 
         public Event CreateEvent()
@@ -21,12 +21,14 @@ namespace TicketingSystem.Models
             shindig.VenueId = VenueId;
             shindig.Name = Name;
 
-            List<Section> categories = new List<Section>();
-            foreach (var category in Categories)
+            List<Section> sections = new List<Section>();
+            int i = 1;
+            foreach (var section in Sections)
             {
-                categories.Add(category.MakeSection(shindig.Id));
+                sections.Add(section.MakeSection(shindig.Id, i));
+                i++;
             }
-            shindig.EventCategories = categories;
+            shindig.Sections = sections;
             return shindig;
 
         }
