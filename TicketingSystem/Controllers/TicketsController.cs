@@ -6,6 +6,5 @@ namespace TicketingSystem.Controllers
     public class TicketsController : ControllerBase
     {
         public TicketsController() { }
-        [Rou]
     }
 }
