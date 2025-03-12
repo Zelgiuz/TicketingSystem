@@ -9,12 +9,15 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddSingleton<CosmosClient>(sp =>
 {
-    var endPoint = builder.Configuration["CosmosDB:Endpoint"];
-    var key = builder.Configuration["CosmosDB:Key"];
-    return new CosmosClient(endPoint, key);
+    var endPoint = builder.Configuration["CosmosDB:AccountEndpoint"];
+    var key = builder.Configuration["CosmosDB:AccountKey"];
+    var database = builder.Configuration["CosmosDB:Database"];
+    var cosmosClient = new CosmosClient(endPoint, key);
+    Task.WaitAll(cosmosClient.CreateDatabaseIfNotExistsAsync(database));
+    return cosmosClient;
 
 });
-builder.Services.AddSingleton(sp =>
+builder.Services.AddSingleton<Database>(sp =>
 {
     var cosmosClient = sp.GetRequiredService<CosmosClient>();
     var database = builder.Configuration["CosmosDB:Database"];

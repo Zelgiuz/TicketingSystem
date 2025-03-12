@@ -1,10 +1,14 @@
-﻿namespace TicketingSystem.Controllers
+﻿using Newtonsoft.Json;
+
+namespace TicketingSystem.Controllers
 {
     public class Ticket
     {
-        public Guid TicketID { get; set; }
-        public Guid EventCategoryID { get; set; }
-        public Guid EventID { get; set; }
+        [JsonProperty("id")]
+        public string Id { get; set; }
+        [JsonProperty("SectionId")]
+        public string SectionId { get; set; }
+        public string EventId { get; set; }
         public string Seat { get; set; } = string.Empty;
         public bool IsSold { get; set; }
         public bool IsReserved { get; set; }

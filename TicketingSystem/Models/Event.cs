@@ -1,4 +1,5 @@
-﻿using TicketingSystem.Models;
+﻿using Newtonsoft.Json;
+using TicketingSystem.Models;
 
 namespace TicketingSystem.Controllers
 {
@@ -6,12 +7,14 @@ namespace TicketingSystem.Controllers
     {
         public Event() { }
 
-        public Guid EventId { get; set; }
-        public Guid VenueId { get; set; }
+        [JsonProperty("id")]
+        public string Id { get; set; }
+        public string VenueId { get; set; }
+        [JsonProperty("Id")]
         public string Name { get; set; }
         public string Description { get; set; }
-        public string StartDate { get; set; }
-        public List<EventCategory> EventCategories { get; set; } = new List<EventCategory>();
+        public DateTime StartDate { get; set; }
+        public List<Section> EventCategories { get; set; } = new List<Section>();
 
     }
 }
