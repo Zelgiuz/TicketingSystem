@@ -51,5 +51,12 @@ namespace TicketingSystem.Controllers
 
 
         }
+        [HttpGet]
+        public async Task<IActionResult> GetEvents([FromQuery] string name)
+        {
+            var eventContainer = database.GetContainer("Events");
+            List<Event> results = await eventContainer.QueryAsync<Event>(x => x.Name == name);
+            return new OkObjectResult(results);
+        }
     }
 }

@@ -12,7 +12,8 @@ namespace TicketingSystem.Controllers
         public string EventId { get; set; }
         public bool IsSold { get; set; }
         public bool IsReserved { get; set; }
-        public DateTime ReservedDateTime { get; set; }
+        public int ReservedUser { get; set; }
+        public DateTime ReservedUntilDateTime { get; set; }
 
         public Ticket(Section section, int seatNumber)
         {
@@ -21,7 +22,8 @@ namespace TicketingSystem.Controllers
             EventId = section.EventId;
             IsSold = false;
             IsReserved = false;
-            ReservedDateTime = DateTime.MinValue;
+            ReservedUser = -1;
+            ReservedUntilDateTime = DateTime.MaxValue;
         }
     }
 }
