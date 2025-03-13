@@ -56,7 +56,7 @@ namespace TicketingSystem.Controllers
                 return new NotFoundObjectResult("No tickets found");
             }
 
-            if (ticketsToReserve.Any(x => x.IsReserved && (x.ReservedUntilDateTime.FromISO8601() > DateTime.UtcNow.ToIso8601().FromISO8601())))
+            if (ticketsToReserve.Any(x => x.IsReserved && (x.ReservedUntilDateTime.FromISO8601() > DateTime.UtcNow.ToISO8601().FromISO8601())))
             {
                 return new BadRequestObjectResult("Tickets are already reserved");
             }
@@ -69,7 +69,7 @@ namespace TicketingSystem.Controllers
             {
                 ticket.IsReserved = true;
                 ticket.ReservedUser = userId;
-                ticket.ReservedUntilDateTime = DateTime.UtcNow.AddMinutes(15).ToIso8601();
+                ticket.ReservedUntilDateTime = DateTime.UtcNow.AddMinutes(15).ToISO8601();
                 await ticketsContainer.UpsertItemAsync(ticket);
             }
             return new OkObjectResult(ticketsToReserve);
@@ -98,7 +98,7 @@ namespace TicketingSystem.Controllers
             {
                 ticket.IsReserved = false;
                 ticket.ReservedUser = -1;
-                ticket.ReservedUntilDateTime = DateTime.MinValue.ToIso8601();
+                ticket.ReservedUntilDateTime = DateTime.MinValue.ToISO8601();
                 await ticketsContainer.UpsertItemAsync(ticket);
             }
             return new OkObjectResult(ticketsToReserve);
@@ -122,7 +122,7 @@ namespace TicketingSystem.Controllers
             {
                 return new NotFoundObjectResult("No tickets found");
             }
-            if (ticketsToBuy.Any(x => x.IsSold || !x.IsReserved || x.ReservedUser != userId || x.ReservedUntilDateTime.FromISO8601() >= DateTime.UtcNow.ToIso8601().FromISO8601()))
+            if (ticketsToBuy.Any(x => x.IsSold || !x.IsReserved || x.ReservedUser != userId || x.ReservedUntilDateTime.FromISO8601() >= DateTime.UtcNow.ToISO8601().FromISO8601()))
             {
                 return new BadRequestObjectResult("Some of the tickets aren't reserved(the reservation may have expired) or are sold");
             }
@@ -137,7 +137,7 @@ namespace TicketingSystem.Controllers
                 ticket.IsSold = true;
                 ticket.IsReserved = false;
                 ticket.ReservedUser = -1;
-                ticket.ReservedUntilDateTime = DateTime.MinValue.ToIso8601();
+                ticket.ReservedUntilDateTime = DateTime.MinValue.ToISO8601();
                 await ticketsContainer.UpsertItemAsync(ticket);
             }
             return new OkObjectResult(ticketsToBuy);

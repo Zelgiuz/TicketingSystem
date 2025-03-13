@@ -2,7 +2,7 @@
 {
     public static class StringExtensions
     {
-        public static string ToIso8601(this DateTime dateTime)
+        public static string ToISO8601(this DateTime dateTime)
         {
             return dateTime.ToString("yyyy-MM-dd-HH:mm:ssK");
         }
