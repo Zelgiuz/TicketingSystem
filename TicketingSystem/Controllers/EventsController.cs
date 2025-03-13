@@ -28,7 +28,18 @@ namespace TicketingSystem.Controllers
 
 
 
-                var container = database.GetContainer("Venues");
+                var venuesContainer = database.GetContainer("Venues");
+                var venue = await venuesContainer.QueryAsync<Venue>(x => x.Id == eventMaker.VenueId);
+                int totalCapacity = 0;
+                foreach (var section in eventMaker.Sections)
+                {
+                    totalCapacity += section.Capacity;
+                }
+                if (totalCapacity >= venue.Capacity)
+                {
+                    return new BadRequestObjectResult("Venue Can't have more than " + venue.Capacity + " attempted to create a total of " + totalCapacity + " tickets reduce the number of tickets in sections");
+                }
+
                 var eventsContainer = database.GetContainer("Events");
 
                 var events = await eventsContainer.QueryAsync<Event>(x => x.VenueId == eventMaker.VenueId && x.StartDate.StartsWith(eventMaker.StartDate));
@@ -79,7 +90,19 @@ namespace TicketingSystem.Controllers
                     return new BadRequestObjectResult("Must have a valid event with at least one section");
                 if (updatedEvent.StartDate == null || updatedEvent.Name == null || updatedEvent.VenueId == null)
                     return new BadRequestObjectResult("Must have a valid event with a name, start date, and venue id");
-                var container = database.GetContainer("Venues");
+
+                var venuesContainer = database.GetContainer("Venues");
+                var venue = await venuesContainer.QueryAsync<Venue>(x => x.Id == updatedEvent.VenueId);
+                int totalCapacity = 0;
+                foreach (var section in updatedEvent.Sections)
+                {
+                    totalCapacity += section.SectionCapacity;
+                }
+                if (totalCapacity >= venue.Capacity)
+                {
+                    return new BadRequestObjectResult("Venue Can't have more than " + venue.Capacity + " attempted to create a total of " + totalCapacity + " tickets reduce the number of tickets in sections");
+                }
+
                 var eventsContainer = database.GetContainer("Events");
                 var events = await eventsContainer.QueryAsync<Event>(x => x.Id == updatedEvent.Id);
                 if (events.Count == 0)
