@@ -19,7 +19,20 @@ builder.Services.AddSingleton<CosmosClient>(sp =>
     List<Task> tasks = new List<Task>();
     tasks.Add(db.DefineContainer("Venues", "/Name").CreateIfNotExistsAsync());
     tasks.Add(db.DefineContainer("Events", "/VenueID").CreateIfNotExistsAsync());
-    tasks.Add(db.DefineContainer("Tickets", "/EventId, /SectionId").CreateIfNotExistsAsync());
+
+    // List of partition keys, in hierarchical order. You can have up to three levels of keys.
+    List<string> ticketSubpartitionKeyPaths = new List<string> {
+    "/EventId",
+    "/SectionId"
+};
+
+    // Create a container properties object
+    ContainerProperties ticketContainerProperties = new ContainerProperties(
+        id: "Tickets",
+        partitionKeyPaths: ticketSubpartitionKeyPaths
+    );
+
+    tasks.Add(db.CreateContainerIfNotExistsAsync(ticketContainerProperties, throughput: 400));
     Task.WaitAll(tasks.ToArray());
     return cosmosClient;
 
