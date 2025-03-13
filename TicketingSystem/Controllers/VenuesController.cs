@@ -61,15 +61,27 @@ namespace TicketingSystem.Controllers
         [HttpPost]
         public async Task<IActionResult> UpdateAVenue([FromBody] Venue venue)
         {
-            var container = database.GetContainer("Venues");
-            var venues = await container.QueryAsync<Venue>(x => x.Id == venue.Id);
+            var venuesContainer = database.GetContainer("Venues");
+            var eventsContainer = database.GetContainer("Events");
+            var ticketsContainer = database.GetContainer("Tickets");
+            var venues = await venuesContainer.QueryAsync<Venue>(x => x.Id == venue.Id);
             if (venues.Count == 0)
             {
                 return new NotFoundObjectResult("No venue found");
             }
+            var events = await eventsContainer.QueryAsync<Event>(x => x.VenueId == venue.Id);
+            foreach (var even in events)
+            {
+                var tickets = await ticketsContainer.QueryAsync<Ticket>(x => x.EventId == even.Id && x.IsSold);
+                if (tickets.Count > venue.MaxCapacity)
+                {
+                    return new BadRequestObjectResult("Can't reduce capacity to less than tickets sold for any event");
+                }
+            }
 
-            await container.DeleteItemAsync<Venue>(venues[0].Id, new PartitionKey(venues[0].Name));
-            await container.UpsertItemAsync(venue);
+
+            await venuesContainer.DeleteItemAsync<Venue>(venues[0].Id, new PartitionKey(venues[0].Name));
+            await venuesContainer.UpsertItemAsync(venue);
             return new OkObjectResult(venue);
         }
     }
