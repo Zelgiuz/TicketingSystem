@@ -35,24 +35,21 @@ namespace TicketingSystem.Controllers
                 {
                     totalCapacity += section.Capacity;
                 }
-                if (totalCapacity >= venue[0].MaxCapacity)
+                if (totalCapacity > venue[0].MaxCapacity)
                 {
-                    return new BadRequestObjectResult("Venue Can't have more than " + venue.Capacity + " attempted to create a total of " + totalCapacity + " tickets reduce the number of tickets in sections");
+                    return new BadRequestObjectResult("Venue Can't have more than " + venue[0].MaxCapacity + " attempted to create a total of " + totalCapacity + " tickets reduce the number of tickets in sections");
                 }
 
                 var eventsContainer = database.GetContainer("Events");
 
                 var events = await eventsContainer.QueryAsync<Event>(x => x.VenueId == eventMaker.VenueId && x.StartDate.StartsWith(eventMaker.StartDate));
-                if (events.Count >= 0)
+                if (events.Count > 0)
                 {
                     return new BadRequestObjectResult("That venue is already booked on that day");
                 }
 
                 var ticketContainer = database.GetContainer("Tickets");
                 result = eventMaker.CreateEvent();
-
-                await eventsContainer.UpsertItemAsync(result);
-                List<Task> tasks = new List<Task>();
                 foreach (var section in result.Sections)
                 {
                     if (section != null)
@@ -60,13 +57,11 @@ namespace TicketingSystem.Controllers
                         for (int i = 0; i < section.SectionCapacity; i++)
                         {
                             Ticket ticket = new Ticket(section, i);
-                            tasks.Add(ticketContainer.UpsertItemAsync(ticket));
+                            await ticketContainer.UpsertItemAsync(ticket);
                         }
                     }
                 }
-                await Task.WhenAll(tasks);
-
-
+                await eventsContainer.UpsertItemAsync(result);
 
             }
             catch (Exception ex)

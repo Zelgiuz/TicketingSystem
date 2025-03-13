@@ -8,14 +8,7 @@
 
         public Section MakeSection(string eventId, string sectionNumber)
         {
-            return new Section()
-            {
-                SectionCapacity = Capacity,
-                EventId = eventId,
-                Price = Price,
-                Id = sectionNumber
-            };
-
+            return new Section(this, eventId, sectionNumber);
         }
     }
 }

@@ -16,8 +16,17 @@ namespace TicketingSystem.Controllers
         public int ReservedUser { get; set; }
         public string ReservedUntilDateTime { get; set; }
 
+        public Ticket()
+        {
+
+        }
+
         public Ticket(Section section, int seatNumber)
         {
+            if (section == null)
+            {
+                throw new System.ArgumentNullException(nameof(section));
+            }
             Id = Guid.NewGuid().ToString();
             SeatNumber = seatNumber;
             SectionId = section.Id;

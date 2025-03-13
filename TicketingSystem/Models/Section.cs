@@ -10,5 +10,18 @@ namespace TicketingSystem.Models
         [JsonProperty("EventId")]
         public string EventId { get; set; }
         public int SectionCapacity { get; set; }
+
+        public Section()
+        {
+        }
+
+        public Section(SectionModel model, string eventId, string sectionId)
+        {
+            Id = sectionId;
+            Price = model.Price;
+            EventId = eventId;
+            SectionCapacity = model.Capacity;
+
+        }
     }
 }

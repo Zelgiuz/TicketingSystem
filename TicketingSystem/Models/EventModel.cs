@@ -22,7 +22,7 @@ namespace TicketingSystem.Models
             shindig.Name = Name;
 
             List<Section> sections = new List<Section>();
-            int i = 1;
+            int i = 0;
             foreach (var section in Sections)
             {
                 sections.Add(section.MakeSection(shindig.Id, i.ToString()));
