@@ -140,7 +140,7 @@ namespace TicketingSystem.Controllers
             {
                 return new NotFoundObjectResult("No tickets found");
             }
-            if (ticketsToBuy.Any(x => x.IsSold || !x.IsReserved || x.ReservedUser != userId || x.ReservedUntilDateTime.FromISO8601() >= DateTime.UtcNow.ToISO8601().FromISO8601()))
+            if (ticketsToBuy.Any(x => x.IsSold || !x.IsReserved || x.ReservedUser != userId || !(x.ReservedUntilDateTime.FromISO8601() > DateTime.UtcNow.ToISO8601().FromISO8601())))
             {
                 return new BadRequestObjectResult("Some of the tickets aren't reserved(the reservation may have expired) or are sold");
             }
