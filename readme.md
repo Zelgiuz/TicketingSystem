@@ -164,12 +164,20 @@ Content-Type: application/json
 
 ---
 
-### **View Available Tickets**  
+### **View Available Tickets for Event**  
 ```http
-GET {TicketingSystem_HostAddress}/event/{eventId}  
+GET {TicketingSystem_HostAddress}/event/{eventId}/available
 ```
 
 ---
+
+### **View All Tickets for Event**  
+```http
+GET {TicketingSystem_HostAddress}/event/{eventId}
+```
+
+---
+
 
 ### **View Available Venues**  
 ```http
