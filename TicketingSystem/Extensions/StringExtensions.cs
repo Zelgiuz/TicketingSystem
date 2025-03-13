@@ -4,12 +4,12 @@
     {
         public static string ToIso8601(this DateTime dateTime)
         {
-            return dateTime.ToUniversalTime().ToString("yyyy-MM-dd-HH:mmZ");
+            return dateTime.ToUniversalTime().ToString("yyyy-MM-dd-HH:mm:ssZ");
         }
 
         public static DateTime FromISO8601(this string dateTime)
         {
-            return DateTime.ParseExact(dateTime, "yyyy-MM-dd-HH:mmZ", null);
+            return DateTime.ParseExact(dateTime, "yyyy-MM-dd-HH:mm:ssZ", null);
         }
     }
 }
