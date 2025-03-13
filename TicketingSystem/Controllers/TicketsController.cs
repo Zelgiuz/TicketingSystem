@@ -21,19 +21,19 @@ namespace TicketingSystem.Controllers
         }
 
         [HttpGet]
-        [Route("/event/{id}/tickets")]
-        public async Task<IActionResult> GetAvailableEventTickets([FromRoute] string id)
+        [Route("/event/{eventId}/tickets")]
+        public async Task<IActionResult> GetAvailableEventTickets([FromRoute] string eventId)
         {
             var eventsContainer = database.GetContainer("Events");
             var ticketsContainer = database.GetContainer("Tickets");
-            var events = await eventsContainer.QueryAsync<Event>(x => x.Id == id);
+            var events = await eventsContainer.QueryAsync<Event>(x => x.Id == eventId);
             if (events.Count == 0)
             {
                 return new NotFoundObjectResult("No event found");
             }
             var eventToCheck = events.First();
             var tickets = await ticketsContainer.QueryAsync<Ticket>(x => x.EventId == eventToCheck.Id);
-            var availableTickets = tickets.Where(x => !x.IsReserved && !x.IsSold).ToList();
+            var availableTickets = tickets.Where(x => (!x.IsReserved || x.ReservedUntilDateTime.FromISO8601() < DateTime.Now) && !x.IsSold).ToList();
             return new OkObjectResult(availableTickets);
         }
 
