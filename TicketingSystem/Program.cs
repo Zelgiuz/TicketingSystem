@@ -14,6 +14,13 @@ builder.Services.AddSingleton<CosmosClient>(sp =>
     var database = builder.Configuration["CosmosDB:Database"];
     var cosmosClient = new CosmosClient(endPoint, key);
     Task.WaitAll(cosmosClient.CreateDatabaseIfNotExistsAsync(database));
+    var db = cosmosClient.GetDatabase(database);
+
+    List<Task> tasks = new List<Task>();
+    tasks.Add(db.DefineContainer("Venues", "/Name").CreateIfNotExistsAsync());
+    tasks.Add(db.DefineContainer("Events", "/VenueID").CreateIfNotExistsAsync());
+    tasks.Add(db.DefineContainer("Tickets", "/EventId, /SectionId").CreateIfNotExistsAsync());
+    Task.WaitAll(tasks.ToArray());
     return cosmosClient;
 
 });
