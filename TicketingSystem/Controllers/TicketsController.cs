@@ -15,13 +15,15 @@ namespace TicketingSystem.Controllers
             database = db;
         }
         [HttpGet]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> GetAllTickets()
         {
-            return new OkResult();
+            var ticketsContainer = database.GetContainer("Tickets");
+            var tickets = await ticketsContainer.QueryAsync<Ticket>(x => true);
+            return new OkObjectResult(tickets);
         }
 
         [HttpGet]
-        [Route("/event/{eventId}/tickets")]
+        [Route("/event/{eventId}/tickets/available")]
         public async Task<IActionResult> GetAvailableEventTickets([FromRoute] string eventId)
         {
             var eventsContainer = database.GetContainer("Events");
@@ -35,6 +37,22 @@ namespace TicketingSystem.Controllers
             var tickets = await ticketsContainer.QueryAsync<Ticket>(x => x.EventId == eventToCheck.Id);
             var availableTickets = tickets.Where(x => !x.IsSold && !(x.ReservedUntilDateTime.FromISO8601() > DateTime.UtcNow.ToISO8601().FromISO8601()));
             return new OkObjectResult(availableTickets);
+        }
+
+        [HttpGet]
+        [Route("/event/{eventId}/tickets/")]
+        public async Task<IActionResult> GetEventTickets([FromRoute] string eventId)
+        {
+            var eventsContainer = database.GetContainer("Events");
+            var ticketsContainer = database.GetContainer("Tickets");
+            var events = await eventsContainer.QueryAsync<Event>(x => x.Id == eventId);
+            if (events.Count == 0)
+            {
+                return new NotFoundObjectResult("No event found");
+            }
+            var eventToCheck = events.First();
+            var tickets = await ticketsContainer.QueryAsync<Ticket>(x => x.EventId == eventToCheck.Id);
+            return new OkObjectResult(tickets);
         }
 
         [HttpPost]
