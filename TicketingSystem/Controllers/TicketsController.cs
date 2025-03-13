@@ -33,7 +33,7 @@ namespace TicketingSystem.Controllers
             }
             var eventToCheck = events.First();
             var tickets = await ticketsContainer.QueryAsync<Ticket>(x => x.EventId == eventToCheck.Id);
-            var availableTickets = tickets.Where(x => (!x.IsReserved || x.ReservedUntilDateTime.FromISO8601() < DateTime.UtcNow) && !x.IsSold).ToList();
+            var availableTickets = tickets.Where(x => !x.IsSold && !(x.ReservedUntilDateTime.FromISO8601() > DateTime.UtcNow.ToISO8601().FromISO8601()));
             return new OkObjectResult(availableTickets);
         }
 
