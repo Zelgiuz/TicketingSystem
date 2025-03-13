@@ -50,7 +50,8 @@ namespace TicketingSystem.Controllers
             {
                 Id = Guid.NewGuid().ToString(),
                 Name = venueModel.Name,
-                Description = venueModel.Description
+                Description = venueModel.Description,
+                MaxCapacity = venueModel.MaxCapacity
             };
             var container = database.GetContainer("Venues");
             await container.UpsertItemAsync(venue);
