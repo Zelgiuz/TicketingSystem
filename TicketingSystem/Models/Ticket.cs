@@ -25,7 +25,7 @@ namespace TicketingSystem.Controllers
             IsSold = false;
             IsReserved = false;
             ReservedUser = -1;
-            ReservedUntilDateTime = DateTime.MaxValue.ToIso8601();
+            ReservedUntilDateTime = DateTime.MinValue.ToIso8601();
         }
     }
 }
