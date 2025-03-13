@@ -12,7 +12,10 @@ namespace TicketingSystem.Controllers
         public string VenueId { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
-        public DateTime StartDate { get; set; }
+        /// <summary>
+        /// Date in yyyy-MM-dd format
+        /// </summary>
+        public string StartDate { get; set; }
         public List<Section> Sections { get; set; } = new List<Section>();
 
     }
