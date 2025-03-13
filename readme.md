@@ -10,7 +10,8 @@ One should only need a cosmos DB that doesn't have a tickets database already fo
 6. Update an Event
 7. Update a Venue
 8. View available Tickets
-9. View Events
-10. View a specific Event
-11. Test Conflicts
-12. Test Bad Requests
+9. View available Venues
+10. View Events
+11. View a specific Event
+12. Test Conflicts
+13. Test Bad Requests
