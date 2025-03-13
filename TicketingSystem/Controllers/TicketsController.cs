@@ -90,7 +90,16 @@ namespace TicketingSystem.Controllers
                 ticket.ReservedUntilDateTime = DateTime.UtcNow.AddMinutes(15).ToISO8601();
                 await ticketsContainer.UpsertItemAsync(ticket);
             }
-            return new OkObjectResult(ticketsToReserve);
+            decimal price = 0;
+            foreach (var ticket in ticketsToReserve)
+            {
+                var section = eventToCheck.Sections.FirstOrDefault(x => x.Id == ticket.SectionId);
+                if (section != null)
+                {
+                    price += section.Price;
+                }
+            }
+            return new OkObjectResult(new ReservedTicketsModel(ticketsToReserve, price));
         }
 
         [HttpPost]
@@ -145,9 +154,19 @@ namespace TicketingSystem.Controllers
                 return new BadRequestObjectResult("Some of the tickets aren't reserved(the reservation may have expired) or are sold");
             }
 
+            decimal price = 0;
+            foreach (var ticket in ticketsToBuy)
+            {
+                var section = eventToCheck.Sections.FirstOrDefault(x => x.Id == ticket.SectionId);
+                if (section != null)
+                {
+                    price += section.Price;
+                }
+            }
+
             //THIS IS WHERE SOME LOGIC INVOLVING PAYMENT WOULD GO
             //Something Like this
-            //var payment = await PaymentService.PayForTickets(ticketsToReserve, userId);
+            //var payment = await PaymentService.PayForTickets(ticketsToReserve, userId,price);
 
 
             foreach (var ticket in ticketsToBuy)
