@@ -55,10 +55,16 @@ namespace TicketingSystem.Controllers
             {
                 return new NotFoundObjectResult("No tickets found");
             }
-            if (ticketsToReserve.Any(x => x.IsReserved && (x.ReservedUntilDateTime.FromISO8601() >= DateTime.Now) || x.IsSold))
+
+            if (ticketsToReserve.Any(x => x.IsReserved && (x.ReservedUntilDateTime.FromISO8601() > DateTime.Now.ToIso8601().FromISO8601())))
             {
-                return new BadRequestObjectResult("Tickets are already reserved or sold");
+                return new BadRequestObjectResult("Tickets are already reserved");
             }
+            if (ticketsToReserve.Any(x => x.IsSold))
+            {
+                return new BadRequestObjectResult("Tickets are already sold");
+            }
+
             foreach (var ticket in ticketsToReserve)
             {
                 ticket.IsReserved = true;
@@ -116,7 +122,7 @@ namespace TicketingSystem.Controllers
             {
                 return new NotFoundObjectResult("No tickets found");
             }
-            if (ticketsToBuy.Any(x => x.IsSold || !x.IsReserved || x.ReservedUser != userId || x.ReservedUntilDateTime.FromISO8601() < DateTime.Now))
+            if (ticketsToBuy.Any(x => x.IsSold || !x.IsReserved || x.ReservedUser != userId || x.ReservedUntilDateTime.FromISO8601() >= DateTime.Now))
             {
                 return new BadRequestObjectResult("Some of the tickets aren't reserved(the reservation may have expired) or are sold");
             }
