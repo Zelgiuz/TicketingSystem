@@ -35,7 +35,7 @@ namespace TicketingSystem.Controllers
                 {
                     totalCapacity += section.Capacity;
                 }
-                if (totalCapacity >= venue.Capacity)
+                if (totalCapacity >= venue[0].MaxCapacity)
                 {
                     return new BadRequestObjectResult("Venue Can't have more than " + venue.Capacity + " attempted to create a total of " + totalCapacity + " tickets reduce the number of tickets in sections");
                 }
@@ -105,10 +105,12 @@ namespace TicketingSystem.Controllers
 
                 var eventsContainer = database.GetContainer("Events");
                 var events = await eventsContainer.QueryAsync<Event>(x => x.Id == updatedEvent.Id);
+
                 if (events.Count == 0)
                 {
                     return new BadRequestObjectResult("Event not found");
                 }
+                var eventToDelete = events[0];
 
                 events = await eventsContainer.QueryAsync<Event>(x => x.VenueId == updatedEvent.VenueId && x.StartDate.StartsWith(updatedEvent.StartDate) && x.Id != updatedEvent.Id);
                 if (events.Count >= 0)
@@ -118,8 +120,8 @@ namespace TicketingSystem.Controllers
 
 
                 var ticketContainer = database.GetContainer("Tickets");
-
-                await eventsContainer.UpsertItemAsync(updatedEvent);
+                await eventsContainer.DeleteItemAsync<Event>(eventToDelete.Id, new PartitionKey(eventToDelete.VenueId));
+                await eventsContainer.CreateItemAsync(updatedEvent);
                 List<Task> tasks = new List<Task>();
                 foreach (var section in updatedEvent.Sections)
                 {

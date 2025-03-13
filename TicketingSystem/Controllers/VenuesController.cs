@@ -62,6 +62,13 @@ namespace TicketingSystem.Controllers
         public async Task<IActionResult> UpdateAVenue([FromBody] Venue venue)
         {
             var container = database.GetContainer("Venues");
+            var venues = await container.QueryAsync<Venue>(x => x.Id == venue.Id);
+            if (venues.Count == 0)
+            {
+                return new NotFoundObjectResult("No venue found");
+            }
+
+            await container.DeleteItemAsync<Venue>(venues[0].Id, new PartitionKey(venues[0].Name));
             await container.UpsertItemAsync(venue);
             return new OkObjectResult(venue);
         }
