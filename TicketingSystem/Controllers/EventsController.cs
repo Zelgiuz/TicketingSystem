@@ -50,6 +50,7 @@ namespace TicketingSystem.Controllers
 
                 var ticketContainer = database.GetContainer("Tickets");
                 result = eventMaker.CreateEvent();
+                List<Task> tasks = new List<Task>();
                 foreach (var section in result.Sections)
                 {
                     if (section != null)
@@ -57,10 +58,11 @@ namespace TicketingSystem.Controllers
                         for (int i = 0; i < section.SectionCapacity; i++)
                         {
                             Ticket ticket = new Ticket(section, i);
-                            await ticketContainer.UpsertItemAsync(ticket);
+                            tasks.Add(ticketContainer.UpsertItemAsync(ticket));
                         }
                     }
                 }
+                await Task.WhenAll(tasks);
                 await eventsContainer.UpsertItemAsync(result);
 
             }
@@ -127,6 +129,7 @@ namespace TicketingSystem.Controllers
                         {
                             Ticket ticket = new Ticket(section, i);
                             var tickets = await ticketContainer.QueryAsync<Ticket>(x => x.EventId == updatedEvent.Id && x.SectionId == section.Id && x.SeatNumber == i);
+                            //Only add tickets that don't exist
                             if (tickets.Count == 0)
                                 tasks.Add(ticketContainer.UpsertItemAsync(ticket));
                         }
@@ -134,7 +137,8 @@ namespace TicketingSystem.Controllers
                         var ticketsToDelete = await ticketContainer.QueryAsync<Ticket>(x => x.EventId == updatedEvent.Id && x.SectionId == section.Id && x.SeatNumber >= section.SectionCapacity);
                         foreach (var ticket in ticketsToDelete)
                         {
-                            tasks.Add(ticketContainer.DeleteItemAsync<Ticket>(ticket.Id, new PartitionKey(ticket.SectionId)));
+                            PartitionKey key = new PartitionKeyBuilder().Add(ticket.EventId).Add(ticket.SectionId).Build();
+                            tasks.Add(ticketContainer.DeleteItemAsync<Ticket>(ticket.Id, key));
                         }
                     }
                     await Task.WhenAll(tasks);
