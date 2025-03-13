@@ -32,9 +32,9 @@ Content-Type: application/json
 }
 
 ***Reserve Ticket(s)***
-### Event ID = the event id returned from above
-### Section ID is "0" in this case but will essentially be the 0 based order of sections created as a string
-### Seat numbers will be 0 to 499 since 500 were created
+*** Event ID = the event id returned from above
+*** Section ID is "0" in this case but will essentially be the 0 based order of sections created as a string
+*** Seat numbers will be 0 to 499 since 500 were created
 POST {TicketingSystem_HostAddress}/event/{eventId}/tickets/user/1/reserve
 Content-Type: application/json
 
@@ -52,9 +52,9 @@ Content-Type: application/json
 }
 
 ***Cancel Reservation(s)***
-### Event ID = the event returned from above
-### Section ID is "0" in this case but will essentially be the 0 based order of sections created as a string
-### Seat numbers will be 0 to 499 since 500 were created
+*** Event ID = the event returned from above
+*** Section ID is "0" in this case but will essentially be the 0 based order of sections created as a string
+*** Seat numbers will be 0 to 499 since 500 were created
 POST {TicketingSystem_HostAddress}/event/{eventId}/tickets/user/1/cancelreservation
 Content-Type: application/json
 
@@ -71,9 +71,9 @@ Content-Type: application/json
   ]
 }
 ***Buy Reserved Tickets***
-### Event ID = the event id returned from above
-### Section ID is "0" in this case but will essentially be the 0 based order of sections created as a string
-### Seat numbers will be 0 to 499 since 500 were created
+*** Event ID = the event id returned from above
+*** Section ID is "0" in this case but will essentially be the 0 based order of sections created as a string
+*** Seat numbers will be 0 to 499 since 500 were created
 POST {TicketingSystem_HostAddress}/event/{eventId}/tickets/user/1/buy
 Content-Type: application/json
 
@@ -90,7 +90,7 @@ Content-Type: application/json
   ]
 }
 ***Update an Event***
-### Venue id = the venue id Returned from the above
+*** Venue id = the venue id Returned from the above
 POST {TicketingSystem_HostAddress}/Events
 Content-Type: application/json
 
