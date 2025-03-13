@@ -107,8 +107,8 @@ namespace TicketingSystem.Controllers
                 }
                 var eventToDelete = events[0];
 
-                events = await eventsContainer.QueryAsync<Event>(x => x.VenueId == updatedEvent.VenueId && x.StartDate.StartsWith(updatedEvent.StartDate) && x.Id != updatedEvent.Id);
-                if (events.Count >= 0)
+                var otherEvents = await eventsContainer.QueryAsync<Event>(x => x.VenueId == updatedEvent.VenueId && x.StartDate.StartsWith(updatedEvent.StartDate) && x.Id != updatedEvent.Id);
+                if (otherEvents.Count > 0)
                 {
                     return new BadRequestObjectResult("Can not make the requested change that venue is booked by another event on that day");
                 }
