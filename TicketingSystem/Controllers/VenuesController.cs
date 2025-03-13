@@ -70,15 +70,15 @@ namespace TicketingSystem.Controllers
                 return new NotFoundObjectResult("No venue found");
             }
             var events = await eventsContainer.QueryAsync<Event>(x => x.VenueId == venue.Id);
+            List<Task> tasks = new List<Task>();
             foreach (var even in events)
             {
-                var tickets = await ticketsContainer.QueryAsync<Ticket>(x => x.EventId == even.Id && x.IsSold);
+                var tickets = await ticketsContainer.QueryAsync<Ticket>(x => x.EventId == even.Id);
                 if (tickets.Count > venue.MaxCapacity)
                 {
-                    return new BadRequestObjectResult("Can't reduce capacity to less than tickets sold for any event");
+                    return new BadRequestObjectResult("An Event with more tickets than the new max capacity has been created, reduce the number of tickets in the event then come back and change the venue");
                 }
             }
-
 
             await venuesContainer.DeleteItemAsync<Venue>(venues[0].Id, new PartitionKey(venues[0].Name));
             await venuesContainer.UpsertItemAsync(venue);
