@@ -1,7 +1,123 @@
 @TicketingSystem_HostAddress = http://localhost:5177
 
+GET {TicketingSystem_HostAddress}/Venues
+
 PUT {TicketingSystem_HostAddress}/Venues
+Content-Type: application/json
 
+{
+  "name": "ACoolVenue",
+  "description": "Mega Wealthy Room",
+  "maxCapacity": 500
+}
 
+POST {TicketingSystem_HostAddress}/Venues
+Content-Type: application/json
 
-###
+{
+  "id": "VenueID",
+  "name": "ACoolVenue",
+  "description": "An exclusive club with 500 seats for an extraordinary experience",
+  "maxCapacity": 500
+}
+
+GET {TicketingSystem_HostAddress}/Events
+
+GET {TicketingSystem_HostAddress}/Events?name=ACoolVenue
+
+### Venue id = the venue id Returned from the above
+PUT {TicketingSystem_HostAddress}/Events
+Content-Type: application/json
+
+{
+  "name": "A Good Event",
+  "startDate": "2025-03-13",
+  "venueId": "The Guid From Above",
+  "description": "Lots of fun at tonight's private Taylor Swift Concert",
+  "sections": [
+    {
+      "name": "string",
+      "capacity": 500,
+      "price": 10000
+    }
+  ]
+}
+
+### Venue id = the venue id Returned from the above
+POST {TicketingSystem_HostAddress}/Events
+Content-Type: application/json
+
+{
+  "name": "A Spectacular Event",
+  "startDate": "2025-03-13",
+  "venueId": "The Guid From Above",
+  "description": "Lots of fun at tonight's private Taylor Swift Concert",
+  "sections": [
+    {
+      "name": "string",
+      "capacity": 500,
+      "price": 10000
+    }
+  ]
+}
+
+GET {TicketingSystem_HostAddress}/Tickets
+
+GET {TicketingSystem_HostAddress}/event/{eventId}
+
+### Event ID = the event id returned from above
+### Section ID is "0" in this case but will essentially be the 0 based order of sections created as a string
+### Seat numbers will be 0 to 499 since 500 were created
+POST {TicketingSystem_HostAddress}/event/{eventId}/tickets/user/1/reserve
+Content-Type: application/json
+
+{
+  "tickets": [
+    {
+      "seatNumber": 0,
+      "sectionId": "0"
+    },
+    {
+      "seatNumber": 1,
+      "sectionId": "0"
+    }
+  ]
+}
+
+### Event ID = the event returned from above
+### Section ID is "0" in this case but will essentially be the 0 based order of sections created as a string
+### Seat numbers will be 0 to 499 since 500 were created
+POST {TicketingSystem_HostAddress}/event/{eventId}/tickets/user/1/cancelreservation
+Content-Type: application/json
+
+{
+  "tickets": [
+    {
+      "seatNumber": 0,
+      "sectionId": "0"
+    },
+    {
+      "seatNumber": 1,
+      "sectionId": "0"
+    }
+  ]
+}
+
+### Event ID = the event id returned from above
+### Section ID is "0" in this case but will essentially be the 0 based order of sections created as a string
+### Seat numbers will be 0 to 499 since 500 were created
+POST {TicketingSystem_HostAddress}/event/{eventId}/tickets/user/1/buy
+Content-Type: application/json
+
+{
+  "tickets": [
+    {
+      "seatNumber": 0,
+      "sectionId": "0"
+    },
+    {
+      "seatNumber": 1,
+      "sectionId": "0"
+    }
+  ]
+}
