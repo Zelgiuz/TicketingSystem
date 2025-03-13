@@ -33,7 +33,7 @@ builder.Services.AddSingleton<CosmosClient>(sp =>
     );
 
     tasks.Add(db.CreateContainerIfNotExistsAsync(ticketContainerProperties, throughput: 400));
-    Task.WaitAll(tasks.ToArray());
+    Task.WaitAll(tasks.ToArray(), 30000);
     return cosmosClient;
 
 });
