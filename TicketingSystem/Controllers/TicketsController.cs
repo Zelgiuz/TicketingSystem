@@ -33,7 +33,7 @@ namespace TicketingSystem.Controllers
             }
             var eventToCheck = events.First();
             var tickets = await ticketsContainer.QueryAsync<Ticket>(x => x.EventId == eventToCheck.Id);
-            var availableTickets = tickets.Where(x => (!x.IsReserved || x.ReservedUntilDateTime.FromISO8601() < DateTime.Now) && !x.IsSold).ToList();
+            var availableTickets = tickets.Where(x => (!x.IsReserved || x.ReservedUntilDateTime.FromISO8601() < DateTime.UtcNow) && !x.IsSold).ToList();
             return new OkObjectResult(availableTickets);
         }
 
@@ -55,8 +55,8 @@ namespace TicketingSystem.Controllers
             {
                 return new NotFoundObjectResult("No tickets found");
             }
-            //Wonky but don't mess with timezones
-            if (ticketsToReserve.Any(x => x.IsReserved && (x.ReservedUntilDateTime.FromISO8601() > DateTime.Now.ToIso8601().FromISO8601())))
+
+            if (ticketsToReserve.Any(x => x.IsReserved && (x.ReservedUntilDateTime.FromISO8601() > DateTime.UtcNow)))
             {
                 return new BadRequestObjectResult("Tickets are already reserved");
             }
@@ -69,7 +69,7 @@ namespace TicketingSystem.Controllers
             {
                 ticket.IsReserved = true;
                 ticket.ReservedUser = userId;
-                ticket.ReservedUntilDateTime = DateTime.Now.AddMinutes(15).ToIso8601();
+                ticket.ReservedUntilDateTime = DateTime.UtcNow.AddMinutes(15).ToIso8601();
                 await ticketsContainer.UpsertItemAsync(ticket);
             }
             return new OkObjectResult(ticketsToReserve);
@@ -122,7 +122,7 @@ namespace TicketingSystem.Controllers
             {
                 return new NotFoundObjectResult("No tickets found");
             }
-            if (ticketsToBuy.Any(x => x.IsSold || !x.IsReserved || x.ReservedUser != userId || x.ReservedUntilDateTime.FromISO8601() >= DateTime.Now))
+            if (ticketsToBuy.Any(x => x.IsSold || !x.IsReserved || x.ReservedUser != userId || x.ReservedUntilDateTime.FromISO8601() >= DateTime.UtcNow))
             {
                 return new BadRequestObjectResult("Some of the tickets aren't reserved(the reservation may have expired) or are sold");
             }
