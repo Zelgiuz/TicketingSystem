@@ -1,6 +1,7 @@
 @TicketingSystem_HostAddress = http://localhost:5177
 
 GET {TicketingSystem_HostAddress}/Venues
+GET {TicketingSystem_HostAddress}/Venues/Available/2024-03-13
 
 PUT {TicketingSystem_HostAddress}/Venues
 Content-Type: application/json
@@ -23,14 +24,14 @@ Content-Type: application/json
 
 GET {TicketingSystem_HostAddress}/Events
 
-GET {TicketingSystem_HostAddress}/Events?name=ACoolVenue
+GET {TicketingSystem_HostAddress}/Events?name=AGoodEvent
 
 ### Venue id = the venue id Returned from the above
 PUT {TicketingSystem_HostAddress}/Events
 Content-Type: application/json
 
 {
-  "name": "A Good Event",
+  "name": "AGoodEvent",
   "startDate": "2025-03-13",
   "venueId": "The Guid From Above",
   "description": "Lots of fun at tonight's private Taylor Swift Concert",
@@ -48,7 +49,7 @@ POST {TicketingSystem_HostAddress}/Events
 Content-Type: application/json
 
 {
-  "name": "A Spectacular Event",
+  "name": "ASpectacularEvent",
   "startDate": "2025-03-13",
   "venueId": "The Guid From Above",
   "description": "Lots of fun at tonight's private Taylor Swift Concert",
