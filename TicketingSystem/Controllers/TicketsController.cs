@@ -55,7 +55,7 @@ namespace TicketingSystem.Controllers
             {
                 return new NotFoundObjectResult("No tickets found");
             }
-
+            //Wonky but don't mess with timezones
             if (ticketsToReserve.Any(x => x.IsReserved && (x.ReservedUntilDateTime.FromISO8601() > DateTime.Now.ToIso8601().FromISO8601())))
             {
                 return new BadRequestObjectResult("Tickets are already reserved");
