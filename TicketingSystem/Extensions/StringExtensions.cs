@@ -4,7 +4,7 @@
     {
         public static string ToIso8601(this DateTime dateTime)
         {
-            return dateTime.ToUniversalTime().ToString("yyyy-MM-dd-HH:mm:ssZ");
+            return dateTime.ToString("yyyy-MM-dd-HH:mm:ssZ");
         }
 
         public static DateTime FromISO8601(this string dateTime)
