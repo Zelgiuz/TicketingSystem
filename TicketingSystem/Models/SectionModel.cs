@@ -6,7 +6,7 @@
         public int Capacity { get; set; }
         public decimal Price { get; set; }
 
-        public Section MakeSection(string eventId, int sectionNumber)
+        public Section MakeSection(string eventId, string sectionNumber)
         {
             return new Section()
             {

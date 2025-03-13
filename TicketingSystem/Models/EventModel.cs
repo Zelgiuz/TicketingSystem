@@ -25,7 +25,7 @@ namespace TicketingSystem.Models
             int i = 1;
             foreach (var section in Sections)
             {
-                sections.Add(section.MakeSection(shindig.Id, i));
+                sections.Add(section.MakeSection(shindig.Id, i.ToString()));
                 i++;
             }
             shindig.Sections = sections;

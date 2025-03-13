@@ -32,12 +32,16 @@ namespace TicketingSystem.Controllers
                 List<Task> tasks = new List<Task>();
                 foreach (var section in result.Sections)
                 {
-                    for (int i = 0; i <= section.SectionCapacity; i++)
+                    if (section != null)
                     {
-                        Ticket ticket = new Ticket(section, i);
-                        await ticketContainer.UpsertItemAsync(ticket);
+                        for (int i = 0; i < section.SectionCapacity; i++)
+                        {
+                            Ticket ticket = new Ticket(section, i);
+                            tasks.Add(ticketContainer.UpsertItemAsync(ticket));
+                        }
                     }
                 }
+                await Task.WhenAll(tasks);
 
 
 

@@ -10,7 +10,6 @@ namespace TicketingSystem.Controllers
         [JsonProperty("id")]
         public string Id { get; set; }
         public string VenueId { get; set; }
-        [JsonProperty("Id")]
         public string Name { get; set; }
         public string Description { get; set; }
         public DateTime StartDate { get; set; }
