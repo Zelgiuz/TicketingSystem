@@ -93,9 +93,9 @@ namespace TicketingSystem.Controllers
                 {
                     totalCapacity += section.SectionCapacity;
                 }
-                if (totalCapacity >= venue.Capacity)
+                if (totalCapacity >= venue[0].MaxCapacity)
                 {
-                    return new BadRequestObjectResult("Venue Can't have more than " + venue.Capacity + " attempted to create a total of " + totalCapacity + " tickets reduce the number of tickets in sections");
+                    return new BadRequestObjectResult("Venue Can't have more than " + venue[0].MaxCapacity + " attempted to create a total of " + totalCapacity + " tickets reduce the number of tickets in sections");
                 }
 
                 var eventsContainer = database.GetContainer("Events");
