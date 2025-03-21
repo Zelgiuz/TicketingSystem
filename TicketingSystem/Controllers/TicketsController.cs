@@ -56,34 +56,34 @@ namespace TicketingSystem.Controllers
         }
 
         [HttpPost]
-        [Route("/event/{eventId}/tickets/user/{userId}/reserve")]
+        [Route("/event/{eventId}/tickets/reserve")]
         public async Task<IActionResult> ReserveTickets([FromRoute] string eventId, [FromRoute] int userId, [FromBody] TicketsToChangeModel ticketsToChange)
         {
             var eventsContainer = database.GetContainer("Events");
             var ticketsContainer = database.GetContainer("Tickets");
-            var events = await eventsContainer.QueryAsync<Event>(x => x.Id == eventId);
-            if (events.Count == 0)
+            var anEvent = (await eventsContainer.QueryAsync<Event>(x => x.Id == eventId)).First();
+            if (anEvent == null)
             {
                 return new NotFoundObjectResult("No event found");
             }
-            var eventToCheck = events.First();
-            var tickets = await ticketsContainer.QueryAsync<Ticket>(x => x.EventId == eventToCheck.Id);
-            var ticketsToReserve = tickets.Where(x => ticketsToChange.Tickets.Any(y => y.SeatNumber == x.SeatNumber && y.SectionId == x.SectionId)).ToList();
-            if (ticketsToReserve.Count == 0)
+
+            var tickets = (await ticketsContainer.QueryAsync<Ticket>(x => x.EventId == eventId && ticketsToChange.Tickets.Any(y => y.SeatNumber == x.SeatNumber && y.SectionId == x.SectionId))).ToList();
+
+            if (tickets.Count == 0)
             {
                 return new NotFoundObjectResult("No tickets found");
             }
 
-            if (ticketsToReserve.Any(x => x.IsReserved && (x.ReservedUntilDateTime.FromISO8601() > DateTime.UtcNow.ToISO8601().FromISO8601())))
+            if (tickets.Any(x => x.IsReserved && (x.ReservedUntilDateTime.FromISO8601() > DateTime.UtcNow)))
             {
                 return new BadRequestObjectResult("Tickets are already reserved");
             }
-            if (ticketsToReserve.Any(x => x.IsSold))
+            if (tickets.Any(x => x.IsSold))
             {
                 return new BadRequestObjectResult("Tickets are already sold");
             }
 
-            foreach (var ticket in ticketsToReserve)
+            foreach (var ticket in tickets)
             {
                 ticket.IsReserved = true;
                 ticket.ReservedUser = userId;
@@ -91,20 +91,20 @@ namespace TicketingSystem.Controllers
                 await ticketsContainer.UpsertItemAsync(ticket);
             }
             decimal price = 0;
-            foreach (var ticket in ticketsToReserve)
+            foreach (var ticket in tickets)
             {
-                var section = eventToCheck.Sections.FirstOrDefault(x => x.Id == ticket.SectionId);
+                var section = anEvent.Sections.FirstOrDefault(x => x.Id == ticket.SectionId);
                 if (section != null)
                 {
                     price += section.Price;
                 }
             }
-            return new OkObjectResult(new ReservedTicketsModel(ticketsToReserve, price));
+            return new OkObjectResult(new ReservedTicketsModel(tickets, price));
         }
 
         [HttpPost]
-        [Route("/event/{eventId}/tickets/user/{userId}/cancelreservation")]
-        public async Task<IActionResult> CancelReservationTickets([FromRoute] string eventId, [FromRoute] int userId, [FromBody] TicketsToChangeModel ticketsToChange)
+        [Route("/event/{eventId}/tickets/cancelreservation")]
+        public async Task<IActionResult> CancelReservationTickets([FromRoute] string eventId, [FromBody] TicketsToChangeModel ticketsToChange)
         {
             var eventsContainer = database.GetContainer("Events");
             var ticketsContainer = database.GetContainer("Tickets");
@@ -113,27 +113,26 @@ namespace TicketingSystem.Controllers
             {
                 return new NotFoundObjectResult("No event found");
             }
-            var eventToCheck = events.First();
-            var tickets = await ticketsContainer.QueryAsync<Ticket>(x => x.EventId == eventToCheck.Id);
+            var tickets = (await ticketsContainer.QueryAsync<Ticket>(x => x.EventId == eventId && ticketsToChange.Tickets.Any(y => y.SeatNumber == x.SeatNumber && y.SectionId == x.SectionId && x.IsReserved && x.ReservedUser == ticketsToChange.UserId))).ToList();
             //Cancel only the tickets that are reserved by the user
-            var ticketsToReserve = tickets.Where(x => ticketsToChange.Tickets.Any(y => y.SeatNumber == x.SeatNumber && y.SectionId == x.SectionId && x.IsReserved && x.ReservedUser == userId)).ToList();
-            if (ticketsToReserve.Count == 0)
+            ;
+            if (tickets.Count == 0)
             {
                 return new NotFoundObjectResult("No tickets found");
             }
-            foreach (var ticket in ticketsToReserve)
+            foreach (var ticket in tickets)
             {
                 ticket.IsReserved = false;
                 ticket.ReservedUser = -1;
                 ticket.ReservedUntilDateTime = DateTime.MinValue.ToISO8601();
                 await ticketsContainer.UpsertItemAsync(ticket);
             }
-            return new OkObjectResult(ticketsToReserve);
+            return new OkObjectResult(tickets);
         }
 
         [HttpPost]
-        [Route("/event/{eventId}/tickets/user/{userId}/buy")]
-        public async Task<IActionResult> BuyTickets([FromRoute] string eventId, [FromRoute] int userId, [FromBody] TicketsToChangeModel ticketsToChange)
+        [Route("/event/{eventId}/tickets/buy")]
+        public async Task<IActionResult> BuyTickets([FromRoute] string eventId, [FromBody] TicketsToChangeModel ticketsToChange)
         {
             var eventsContainer = database.GetContainer("Events");
             var ticketsContainer = database.GetContainer("Tickets");
@@ -143,19 +142,18 @@ namespace TicketingSystem.Controllers
                 return new NotFoundObjectResult("No event found");
             }
             var eventToCheck = events.First();
-            var tickets = await ticketsContainer.QueryAsync<Ticket>(x => x.EventId == eventToCheck.Id);
-            var ticketsToBuy = tickets.Where(x => ticketsToChange.Tickets.Any(y => y.SeatNumber == x.SeatNumber && y.SectionId == x.SectionId)).ToList();
-            if (ticketsToBuy.Count == 0)
+            var tickets = await ticketsContainer.QueryAsync<Ticket>(x => x.EventId == eventToCheck.Id && ticketsToChange.Tickets.Any(y => y.SeatNumber == x.SeatNumber && y.SectionId == x.SectionId));
+            if (tickets.Count == 0)
             {
                 return new NotFoundObjectResult("No tickets found");
             }
-            if (ticketsToBuy.Any(x => x.IsSold || !x.IsReserved || x.ReservedUser != userId || !(x.ReservedUntilDateTime.FromISO8601() > DateTime.UtcNow.ToISO8601().FromISO8601())))
+            if (tickets.Any(x => x.IsSold || !x.IsReserved || x.ReservedUser != ticketsToChange.UserId || !(x.ReservedUntilDateTime.FromISO8601() > DateTime.UtcNow)))
             {
                 return new BadRequestObjectResult("Some of the tickets aren't reserved(the reservation may have expired) or are sold");
             }
 
             decimal price = 0;
-            foreach (var ticket in ticketsToBuy)
+            foreach (var ticket in tickets)
             {
                 var section = eventToCheck.Sections.FirstOrDefault(x => x.Id == ticket.SectionId);
                 if (section != null)
@@ -169,7 +167,7 @@ namespace TicketingSystem.Controllers
             //var payment = await PaymentService.PayForTickets(ticketsToReserve, userId,price);
 
 
-            foreach (var ticket in ticketsToBuy)
+            foreach (var ticket in tickets)
             {
                 ticket.IsSold = true;
                 ticket.IsReserved = false;
@@ -177,7 +175,7 @@ namespace TicketingSystem.Controllers
                 ticket.ReservedUntilDateTime = DateTime.MinValue.ToISO8601();
                 await ticketsContainer.UpsertItemAsync(ticket);
             }
-            return new OkObjectResult(ticketsToBuy);
+            return new OkObjectResult(tickets);
         }
     }
 }
