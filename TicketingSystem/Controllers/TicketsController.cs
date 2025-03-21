@@ -164,7 +164,7 @@ namespace TicketingSystem.Controllers
 
             //THIS IS WHERE SOME LOGIC INVOLVING PAYMENT WOULD GO
             //Something Like this
-            //var payment = await PaymentService.PayForTickets(ticketsToReserve, userId,price);
+            //var payment = await PaymentService.PayForTickets(tickets, userId,price);
 
 
             foreach (var ticket in tickets)
